@@ -4,12 +4,10 @@ import com.levik.jdbc.configuration.exception.JDBCException;
 import com.levik.jdbc.configuration.model.BasicDataSource;
 import com.levik.jdbc.configuration.model.DDLAuto;
 import com.levik.jdbc.configuration.model.DataBaseType;
+import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 public class JdbcTemplate extends AbstractTemplate{
@@ -20,7 +18,7 @@ public class JdbcTemplate extends AbstractTemplate{
 
     public void createTable(Object obj) {
         Connection connection = null;
-        final Map<String, String> dataBaseMetaDate = getMetaDateByObjectWithType(obj);
+        final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         try {
             connection = getConnection();
@@ -29,7 +27,7 @@ public class JdbcTemplate extends AbstractTemplate{
                 final String createQuery = super.createQuery(dataBaseMetaDate);
                 JDBCUtils.performStatement(connection, createQuery);
             } else if (DDLAuto.CREATE_DROP == ddlAuto) {
-                final String dropQuery = super.dropQuery(dataBaseMetaDate);
+                final String dropQuery = super.dropQuery();
                 final String createQuery = super.createQuery(dataBaseMetaDate);
 
                 try {
@@ -47,7 +45,7 @@ public class JdbcTemplate extends AbstractTemplate{
 
     public void save(Object obj){
         Connection connection = null;
-        final Map<String, Object> dataBaseMetaDate = getMetaDateByObjectWithValues(obj);
+        final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.saveQuery(dataBaseMetaDate);
 
@@ -62,7 +60,7 @@ public class JdbcTemplate extends AbstractTemplate{
 
     public void update(Object obj){
         Connection connection = null;
-        final Map<String, Object> dataBaseMetaDate = getMetaDateByObjectWithValuesAndPk(obj);
+        final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.updateQuery(dataBaseMetaDate);
 
@@ -77,7 +75,7 @@ public class JdbcTemplate extends AbstractTemplate{
 
     public void delete(Object obj){
         Connection connection = null;
-        final Map<String, Object> dataBaseMetaDate = getMetaDateByObjectWithValuesAndPk(obj);
+        final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.deleteQuery(dataBaseMetaDate);
 

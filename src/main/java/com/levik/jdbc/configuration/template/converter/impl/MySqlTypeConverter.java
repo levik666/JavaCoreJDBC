@@ -1,5 +1,6 @@
 package com.levik.jdbc.configuration.template.converter.impl;
 
+import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.template.converter.TypeConverter;
 
 import java.util.HashMap;
@@ -20,19 +21,17 @@ public class MySqlTypeConverter implements TypeConverter{
         this.dataBaseParams.putAll(dataBaseParams);
     }
 
-    public Map<String, String> convertType(final Map<String, String> classParams) {
-        final Map<String, String> convertedMap = new HashMap<>();
-        for (Map.Entry<String, String> next : classParams.entrySet()) {
+    public Map<String, ValueType> convertType(final Map<String, ValueType> classParams) {
+        for (Map.Entry<String, ValueType> next : classParams.entrySet()) {
             final String key = next.getKey();
-            final String value = next.getValue();
-            final String newValue = dataBaseParams.get(value);
+            final ValueType valueType = next.getValue();
+            final String newValue = dataBaseParams.get(valueType.getType());
             if (newValue != null){
-                convertedMap.put(key, newValue);
-            } else {
-                convertedMap.put(key, value);
+                valueType.setType(newValue);
+                classParams.put(key, valueType);
             }
         }
 
-        return convertedMap;
+        return classParams;
     }
 }

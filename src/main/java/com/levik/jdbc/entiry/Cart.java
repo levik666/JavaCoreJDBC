@@ -36,4 +36,34 @@ public class Cart {
     public void setCartId(int cartId) {
         this.cartId = cartId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cart cart = (Cart) o;
+
+        if (cartId != cart.cartId) return false;
+        if (name != null ? !name.equals(cart.name) : cart.name != null) return false;
+        return !(lastName != null ? !lastName.equals(cart.lastName) : cart.lastName != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cartId;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId=" + cartId +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }

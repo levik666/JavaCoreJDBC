@@ -2,75 +2,56 @@ package com.levik.jdbc.configuration.template;
 
 import com.levik.jdbc.configuration.annotations.Entity;
 import com.levik.jdbc.configuration.annotations.Id;
+import com.levik.jdbc.configuration.model.ValueType;
 
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ReflectionAnalyzes {
+    private String tableName;
 
-    protected static final String TABLE_NAME = "TABLE_NAME";
-    protected static final String PK = "PK";
+    private List<String> primaryKeys;
 
-    protected Map<String , String> getMetaDateByObjectWithType(Object obj){
-        final Map<String , String> metaDate = new LinkedHashMap<>();
+    public String getTableName() {
+        return tableName;
+    }
+
+    public List<String> getPrimaryKeys() {
+        return primaryKeys;
+    }
+
+    protected Map<String, ValueType> getMetaDateByObjectWithType(Object obj) {
+        final Map<String, ValueType> metaDate = new ConcurrentHashMap<>();
+        primaryKeys = new CopyOnWriteArrayList<>();
         final Class<?> aClass = obj.getClass();
 
-        if (aClass.isAnnotationPresent(Entity.class)){
+        if (aClass.isAnnotationPresent(Entity.class)) {
             final Entity annotation = aClass.getAnnotation(Entity.class);
-            final String name = annotation.name();
-            metaDate.put(TABLE_NAME, name);
+            tableName = annotation.name();
         }
 
         final Field[] declaredFields = aClass.getDeclaredFields();
-        for(Field field : declaredFields){
-            final String fieldName = field.getName();
-            if (field.isAnnotationPresent(Id.class)){
-                metaDate.put(PK, fieldName);
-            }
-
-            final String fieldType = field.getType().getName();
-            metaDate.put(fieldName, fieldType);
-        }
-
-        return metaDate;
-    }
-
-    protected Map<String , Object> getMetaDateByObjectWithValues(Object obj){
-        return getMetaDateByObjectWithValues(obj, false);
-    }
-    protected Map<String , Object> getMetaDateByObjectWithValuesAndPk(Object obj){
-        return getMetaDateByObjectWithValues(obj, true);
-    }
-
-    private Map<String , Object> getMetaDateByObjectWithValues(Object obj, boolean withPk){
-        final Map<String , Object> metaDate = new LinkedHashMap<>();
-        final Class<?> aClass = obj.getClass();
-
-        if (aClass.isAnnotationPresent(Entity.class)){
-            final Entity annotation = aClass.getAnnotation(Entity.class);
-            final String name = annotation.name();
-            metaDate.put(TABLE_NAME, name);
-        }
-
-        final Field[] declaredFields = aClass.getDeclaredFields();
-        for(Field field : declaredFields){
+        for (final Field field : declaredFields) {
             field.setAccessible(true);
             final String fieldName = field.getName();
 
-            if (withPk){
-                if (field.isAnnotationPresent(Id.class)){
-                    metaDate.put(PK, fieldName);
-                }
+            if (field.isAnnotationPresent(Id.class)) {
+                primaryKeys.add(fieldName);
             }
 
-            Object fieldType;
+            final String fieldType = field.getType().getName();
+            Object fieldValue;
             try {
-                fieldType = field.get(obj);
+                fieldValue = field.get(obj);
             } catch (IllegalAccessException exe) {
                 throw new RuntimeException("Can't get access to field " + field.getName() + "due to exe " + exe.getMessage());
             }
-            metaDate.put(fieldName, fieldType);
+
+            final ValueType valueType = new ValueType(fieldType, fieldValue);
+            metaDate.put(fieldName, valueType);
         }
 
         return metaDate;
