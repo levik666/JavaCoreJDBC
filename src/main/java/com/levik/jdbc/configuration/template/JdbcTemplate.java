@@ -23,10 +23,10 @@ public class JdbcTemplate extends AbstractTemplate{
         try {
             connection = getConnection();
 
-            if (DDLAuto.CREATE == ddlAuto) {
+            if (DDLAuto.CREATE == getDdlAuto()) {
                 final String createQuery = super.createQuery(dataBaseMetaDate);
                 JDBCUtils.performStatement(connection, createQuery);
-            } else if (DDLAuto.CREATE_DROP == ddlAuto) {
+            } else if (DDLAuto.CREATE_DROP == getDdlAuto()) {
                 final String dropQuery = super.dropQuery();
                 final String createQuery = super.createQuery(dataBaseMetaDate);
 
