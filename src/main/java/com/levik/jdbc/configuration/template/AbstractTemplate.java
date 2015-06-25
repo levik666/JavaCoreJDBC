@@ -39,11 +39,14 @@ public class AbstractTemplate extends QueryBuilder {
     }
 
     protected Map<String, ValueType> objectProcessedBefore(final Object obj){
+        Map<String, ValueType> dataBaseMetaDate = null;
         if (bucket.containsKey(obj)){
             return bucket.get(obj);
         }
 
-        return getMetaDateByObjectWithType(obj);
+        dataBaseMetaDate = getMetaDateByObjectWithType(obj);
+        bucket.put(obj, dataBaseMetaDate);
+        return dataBaseMetaDate;
     }
 
 }
