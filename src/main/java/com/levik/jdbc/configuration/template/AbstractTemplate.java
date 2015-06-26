@@ -1,14 +1,14 @@
 package com.levik.jdbc.configuration.template;
 
+import java.sql.Connection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.levik.jdbc.configuration.model.BasicDataSource;
 import com.levik.jdbc.configuration.model.DDLAuto;
 import com.levik.jdbc.configuration.model.DataBaseType;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
-
-import java.sql.Connection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AbstractTemplate extends QueryBuilder {
 

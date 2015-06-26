@@ -1,12 +1,10 @@
 package com.levik.jdbc.configuration.template;
 
+import java.util.Map;
+
 import com.levik.jdbc.configuration.exception.JDBCException;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.template.converter.TypeConverter;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class QueryBuilder<T> extends ReflectionAnalyzes{
 

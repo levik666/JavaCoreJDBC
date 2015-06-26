@@ -1,5 +1,10 @@
 package com.levik.jdbc.configuration.template;
 
+import java.sql.Connection;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import com.levik.jdbc.configuration.exception.JDBCException;
 import com.levik.jdbc.configuration.model.BasicDataSource;
 import com.levik.jdbc.configuration.model.DDLAuto;
@@ -7,17 +12,17 @@ import com.levik.jdbc.configuration.model.DataBaseType;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
 
-import java.sql.Connection;
-import java.util.Map;
-
 public class JdbcTemplate extends AbstractTemplate{
+	static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
 
     public JdbcTemplate(DataBaseType dataBaseType, BasicDataSource dataSource) {
         super(dataBaseType, dataSource);
     }
 
     public void createTable(Object obj) {
-        Connection connection = null;
+    	LOGGER.info("Create table for class: "+ obj.getClass().getName());
+        
+    	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         try {
@@ -44,7 +49,9 @@ public class JdbcTemplate extends AbstractTemplate{
     }
 
     public void save(Object obj){
-        Connection connection = null;
+    	LOGGER.info("Save entity: "+ obj.getClass().getName());
+        
+    	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.saveQuery(dataBaseMetaDate);
@@ -59,7 +66,9 @@ public class JdbcTemplate extends AbstractTemplate{
     }
 
     public void update(Object obj){
-        Connection connection = null;
+    	LOGGER.info("Update entity: "+ obj.getClass().getName());
+
+    	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.updateQuery(dataBaseMetaDate);
@@ -74,7 +83,9 @@ public class JdbcTemplate extends AbstractTemplate{
     }
 
     public void delete(Object obj){
-        Connection connection = null;
+    	LOGGER.info("Delete entity: "+ obj.getClass().getName());
+        
+    	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
         final String saveQuery = super.deleteQuery(dataBaseMetaDate);
