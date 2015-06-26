@@ -1,6 +1,7 @@
 package com.levik.jdbc.configuration.template;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -97,5 +98,22 @@ public class JdbcTemplate extends AbstractTemplate{
         } finally {
             JDBCUtils.releaseConnection(connection);
         }
+    }
+    
+    public ResultSet select(String query) {
+        LOGGER.info("Select from Db: " + query);
+
+        Connection connection = null;
+        ResultSet resultSet = null;
+        
+        final String selectQuery = super.selectQuery(query);
+        
+        try {
+            connection = getConnection();
+            resultSet = JDBCUtils.performPrepareStatementWithResult(connection, selectQuery);
+        } finally {
+            JDBCUtils.releaseConnection(connection);
+        }
+        return resultSet;
     }
 }

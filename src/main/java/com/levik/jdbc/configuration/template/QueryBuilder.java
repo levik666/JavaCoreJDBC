@@ -86,6 +86,12 @@ public class QueryBuilder<T> extends ReflectionAnalyzes{
 
         return query.toString();
     }
+    
+    ////SELECT C.name FROM Cart C WHERE C.id > 1 ORDER BY C.lastName DESC
+    public String selectQuery(String query){
+        
+        return "";
+    }
 
     private void updateHelper(final StringBuilder query, final Map<String, ValueType> dataBaseMetaDate) {
         int size = dataBaseMetaDate.size();
@@ -211,4 +217,5 @@ public class QueryBuilder<T> extends ReflectionAnalyzes{
         final String lastElement = query.substring(length - 1, length);
         return !COMMA.equals(lastElement);
     }
+    
 }
