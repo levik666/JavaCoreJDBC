@@ -108,15 +108,15 @@ public class JdbcTemplate extends AbstractTemplate{
 
 		Connection connection = null;
 		ResultSet resultSet = null;
-		T newCart = null;
+		T obj = null;
 
 		try {
 			connection = getConnection();
 			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
 					query);
 			if (resultSet.next()) {
-				newCart = new ReflectionAnalyzes().getObjectFromResultSet(
-						resultSet, aclass);
+                obj = getObjectFromResultSet(
+                        resultSet, aclass);
 			}
 		} catch (SQLException | IllegalArgumentException
 				| IllegalAccessException | InstantiationException e1) {
@@ -124,7 +124,7 @@ public class JdbcTemplate extends AbstractTemplate{
 		} finally {
 			JDBCUtils.releaseConnection(connection);
 		}
-		return newCart;
+		return obj;
 	}
 	
 	public <T> Set<T> selectSet(String query, Class<T> aclass) {
@@ -132,15 +132,15 @@ public class JdbcTemplate extends AbstractTemplate{
 
 		Connection connection = null;
 		ResultSet resultSet = null;
-		Set<T> objSet = new HashSet<T>();
+		final Set<T> objSet = new HashSet<T>();
 
 		try {
 			connection = getConnection();
 			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
 					query);
 			while (resultSet.next()) {
-				objSet.add(new ReflectionAnalyzes().getObjectFromResultSet(
-						resultSet, aclass));
+                T obj = getObjectFromResultSet(resultSet, aclass);
+                objSet.add(obj);
 			}
 		} catch (SQLException | IllegalArgumentException
 				| IllegalAccessException | InstantiationException e1) {
