@@ -1,8 +1,5 @@
 package com.levik.jdbc;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
 
 import com.levik.jdbc.configuration.model.BasicDataSource;
@@ -30,19 +27,9 @@ public class Application {
         jdbcTemplate.createTable(cart);
         jdbcTemplate.save(cart);
         jdbcTemplate.update(cart);
-        ResultSet rs = jdbcTemplate.select("Select * From cart");
-        try {
-            while (rs.next()) {
-                String coffeeName = rs.getString("cartId");
-                String supplierID = rs.getString("name");
-                String price = rs.getString("lastName");
-                System.out.println(coffeeName + "\t" + supplierID +
-                                   "\t" + price + "\t");
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Cart rs = (Cart) jdbcTemplate.select("Select * From cart", Cart.class);
+        System.out.println(rs);
+        
         jdbcTemplate.delete(cart);
 
     }

@@ -2,6 +2,7 @@ package com.levik.jdbc.configuration.template;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import com.levik.jdbc.configuration.model.DDLAuto;
 import com.levik.jdbc.configuration.model.DataBaseType;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
+import com.levik.jdbc.entiry.Cart;
 
 public class JdbcTemplate extends AbstractTemplate{
 	static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
@@ -100,20 +102,30 @@ public class JdbcTemplate extends AbstractTemplate{
         }
     }
     
-    public ResultSet select(String query) {
-        LOGGER.info("Select from Db: " + query);
+	public Object select(String query, Class aclass) {
+		LOGGER.info("Select from Db: " + query);
 
-        Connection connection = null;
-        ResultSet resultSet = null;
-        
-        final String selectQuery = super.selectQuery(query);
-        
-        try {
-            connection = getConnection();
-            resultSet = JDBCUtils.performPrepareStatementWithResult(connection, selectQuery);
-        } finally {
-            JDBCUtils.releaseConnection(connection);
-        }
-        return resultSet;
-    }
+		Connection connection = null;
+		ResultSet resultSet = null;
+
+		Object newCart = null;
+
+		try {
+			connection = getConnection();
+			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
+					query);
+
+			resultSet.next();
+
+			newCart = ResultSetAnalizer.getObjectFromResultSet(resultSet,
+					Cart.class);
+
+		} catch (SQLException | IllegalArgumentException
+				| IllegalAccessException | InstantiationException e1) {
+			e1.printStackTrace();
+		} finally {
+			JDBCUtils.releaseConnection(connection);
+		}
+		return newCart;
+	}
 }
