@@ -1,5 +1,7 @@
 package com.levik.jdbc;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import com.levik.jdbc.configuration.model.BasicDataSource;
@@ -24,13 +26,23 @@ public class Application {
         cart.setName("test2");
         cart.setLastName("test2");
         
+        Cart cart2 = new Cart();
+        cart2.setCartId(3);
+        cart2.setName("test3");
+        cart2.setLastName("test3");
+        
         jdbcTemplate.createTable(cart);
         jdbcTemplate.save(cart);
         jdbcTemplate.update(cart);
-        Cart rs = (Cart) jdbcTemplate.select("Select * From cart", Cart.class);
+        jdbcTemplate.save(cart2);
+        Cart rs = jdbcTemplate.select("Select * From cart Where cartId = 3", Cart.class);
         System.out.println(rs);
         
+        Set<Cart> carts = jdbcTemplate.selectSet("Select * From cart", Cart.class);
+        System.out.println(carts);
+        
         jdbcTemplate.delete(cart);
+        jdbcTemplate.delete(cart2);
 
     }
 }

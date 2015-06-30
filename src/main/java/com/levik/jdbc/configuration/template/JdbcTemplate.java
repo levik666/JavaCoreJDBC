@@ -3,7 +3,9 @@ package com.levik.jdbc.configuration.template;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -13,7 +15,6 @@ import com.levik.jdbc.configuration.model.DDLAuto;
 import com.levik.jdbc.configuration.model.DataBaseType;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
-import com.levik.jdbc.entiry.Cart;
 
 public class JdbcTemplate extends AbstractTemplate{
 	static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
@@ -102,24 +103,21 @@ public class JdbcTemplate extends AbstractTemplate{
         }
     }
     
-	public Object select(String query, Class aclass) {
+	public <T> T select(String query, Class<T> aclass) {
 		LOGGER.info("Select from Db: " + query);
 
 		Connection connection = null;
 		ResultSet resultSet = null;
-
-		Object newCart = null;
+		T newCart = null;
 
 		try {
 			connection = getConnection();
 			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
 					query);
-
-			resultSet.next();
-
-			newCart = ResultSetAnalizer.getObjectFromResultSet(resultSet,
-					Cart.class);
-
+			if (resultSet.next()) {
+				newCart = new ReflectionAnalyzes().getObjectFromResultSet(
+						resultSet, aclass);
+			}
 		} catch (SQLException | IllegalArgumentException
 				| IllegalAccessException | InstantiationException e1) {
 			e1.printStackTrace();
@@ -127,5 +125,29 @@ public class JdbcTemplate extends AbstractTemplate{
 			JDBCUtils.releaseConnection(connection);
 		}
 		return newCart;
+	}
+	
+	public <T> Set<T> selectSet(String query, Class<T> aclass) {
+		LOGGER.info("Select from Db: " + query);
+
+		Connection connection = null;
+		ResultSet resultSet = null;
+		Set<T> objSet = new HashSet<T>();
+
+		try {
+			connection = getConnection();
+			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
+					query);
+			while (resultSet.next()) {
+				objSet.add(new ReflectionAnalyzes().getObjectFromResultSet(
+						resultSet, aclass));
+			}
+		} catch (SQLException | IllegalArgumentException
+				| IllegalAccessException | InstantiationException e1) {
+			e1.printStackTrace();
+		} finally {
+			JDBCUtils.releaseConnection(connection);
+		}
+		return objSet;
 	}
 }
