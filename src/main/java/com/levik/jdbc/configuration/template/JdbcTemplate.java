@@ -53,7 +53,7 @@ public class JdbcTemplate extends AbstractTemplate{
     }
 
     public void save(Object obj){
-    	LOGGER.info("Save entity: "+ obj.getClass().getName());
+    	LOGGER.info("Save entity: " + obj.getClass().getName());
         
     	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
@@ -119,8 +119,8 @@ public class JdbcTemplate extends AbstractTemplate{
                         resultSet, aclass);
 			}
 		} catch (SQLException | IllegalArgumentException
-				| IllegalAccessException | InstantiationException e1) {
-			e1.printStackTrace();
+				| IllegalAccessException | InstantiationException exe) {
+            throw new JDBCException(exe.getMessage());
 		} finally {
 			JDBCUtils.releaseConnection(connection);
 		}
@@ -143,8 +143,8 @@ public class JdbcTemplate extends AbstractTemplate{
                 objSet.add(obj);
 			}
 		} catch (SQLException | IllegalArgumentException
-				| IllegalAccessException | InstantiationException e1) {
-			e1.printStackTrace();
+				| IllegalAccessException | InstantiationException exe) {
+			throw new JDBCException(exe.getMessage());
 		} finally {
 			JDBCUtils.releaseConnection(connection);
 		}
