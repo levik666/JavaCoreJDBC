@@ -35,10 +35,10 @@ public class Application {
         jdbcTemplate.save(cart);
         jdbcTemplate.update(cart);
         jdbcTemplate.save(cart2);
-        Cart rs = jdbcTemplate.select("Select * From cart Where cartId = 3", Cart.class);
+        Cart rs = jdbcTemplate.select("Select * From Cart Where cartId = 3", Cart.class);
         System.out.println(rs);
         
-        Set<Cart> carts = jdbcTemplate.selectSet("Select * From cart", Cart.class);
+        Set<Cart> carts = jdbcTemplate.selectSet("Select * From Cart", Cart.class);
         System.out.println(carts);
         
         jdbcTemplate.delete(cart);
