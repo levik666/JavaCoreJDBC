@@ -17,7 +17,7 @@ public class Application {
     public static void main(String[] args) {
         LOGGER.info("Run \"main\" method");
         final BasicDataSource basicDataSource = new BasicDataSource("localhost", "3306", "simple", "root", "root");
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataBaseType.MY_SQL, basicDataSource);
+        final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataBaseType.MY_SQL, basicDataSource, 5);
         jdbcTemplate.setTypeConverter(new MySqlTypeConverter());
         jdbcTemplate.setDdlAuto(DDLAuto.CREATE_DROP);
 
@@ -43,6 +43,8 @@ public class Application {
         
         jdbcTemplate.delete(cart);
         jdbcTemplate.delete(cart2);
+
+        jdbcTemplate.destroyAll();
 
     }
 }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.levik.jdbc.configuration.pool.PooledDataSource;
 import org.apache.log4j.Logger;
 
 import com.levik.jdbc.configuration.exception.JDBCException;
@@ -16,11 +17,13 @@ import com.levik.jdbc.configuration.model.DataBaseType;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
 
-public class JdbcTemplate extends AbstractTemplate{
+public class JdbcTemplate extends PooledDataSource {
 	static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
 
-    public JdbcTemplate(DataBaseType dataBaseType, BasicDataSource dataSource) {
-        super(dataBaseType, dataSource);
+    public JdbcTemplate(DataBaseType dataBaseType, BasicDataSource dataSource, int capacity) {
+        super(dataBaseType, dataSource, capacity);
+
+        initDataSource();
     }
 
     public void createTable(Object obj) {
@@ -48,7 +51,7 @@ public class JdbcTemplate extends AbstractTemplate{
                 JDBCUtils.performStatement(connection, createQuery);
             }
         } finally {
-            JDBCUtils.releaseConnection(connection);
+            released(connection);
         }
     }
 
@@ -65,7 +68,7 @@ public class JdbcTemplate extends AbstractTemplate{
             JDBCUtils.performPrepareStatement(connection, saveQuery);
 
         } finally {
-            JDBCUtils.releaseConnection(connection);
+            released(connection);
         }
     }
 
@@ -82,7 +85,7 @@ public class JdbcTemplate extends AbstractTemplate{
             JDBCUtils.performPrepareStatement(connection, saveQuery);
 
         } finally {
-            JDBCUtils.releaseConnection(connection);
+            released(connection);
         }
     }
 
@@ -99,7 +102,7 @@ public class JdbcTemplate extends AbstractTemplate{
             JDBCUtils.performPrepareStatement(connection, saveQuery);
 
         } finally {
-            JDBCUtils.releaseConnection(connection);
+            released(connection);
         }
     }
     
@@ -122,7 +125,7 @@ public class JdbcTemplate extends AbstractTemplate{
 				| IllegalAccessException | InstantiationException exe) {
             throw new JDBCException(exe.getMessage());
 		} finally {
-			JDBCUtils.releaseConnection(connection);
+            released(connection);
 		}
 		return obj;
 	}
@@ -146,8 +149,8 @@ public class JdbcTemplate extends AbstractTemplate{
 				| IllegalAccessException | InstantiationException exe) {
 			throw new JDBCException(exe.getMessage());
 		} finally {
-			JDBCUtils.releaseConnection(connection);
+            released(connection);
 		}
-		return objSet;
+        return objSet;
 	}
 }
