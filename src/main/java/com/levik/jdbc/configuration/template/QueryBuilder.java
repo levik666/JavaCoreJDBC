@@ -3,6 +3,7 @@ package com.levik.jdbc.configuration.template;
 import java.util.Map;
 
 import com.levik.jdbc.configuration.exception.JDBCException;
+import com.levik.jdbc.configuration.model.Foreign;
 import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.template.converter.TypeConverter;
 
@@ -27,6 +28,8 @@ public class QueryBuilder<T> extends ReflectionAnalyzes{
     private static final String DELETE_FROM_TABLE = "DELETE FROM ";
     private static final String VALUES = " VALUES ";
     private static final String PRIMARY_KEY = "PRIMARY KEY ";
+    private static final String FOREIGN_KEY = "FOREIGN KEY ";
+    private static final String REFERENCES = " REFERENCES ";
 
     protected TypeConverter typeConverter;
 
@@ -47,6 +50,10 @@ public class QueryBuilder<T> extends ReflectionAnalyzes{
 
         if (!getPrimaryKeys().isEmpty()){
             addPrimaryKey(query);
+        }
+
+        if (!getForeignKeys().isEmpty()){
+            addForeignKey(query);
         }
 
         query.append(CLOSE_BRACKETS);
@@ -190,6 +197,25 @@ public class QueryBuilder<T> extends ReflectionAnalyzes{
 
         for (final String key : getPrimaryKeys()){
             query.append(PRIMARY_KEY).append(OPEN_BRACKETS).append(key).append(CLOSE_BRACKETS);
+            index++;
+
+            if (isThisNotLastElement(index, size)){
+                query.append(COMMA);
+            }
+        }
+    }
+
+    private void addForeignKey(final StringBuilder query){
+        int index = DEFAULT_ROW_COUNT;
+        int size = getPrimaryKeys().size();
+
+        if (isCommaAbsent(query)){
+            query.append(COMMA).append(SPACE);
+        }
+
+        for (final Foreign foreign : getForeignKeys()){
+            query.append(FOREIGN_KEY).append(OPEN_BRACKETS).append(foreign.getKey()).append(CLOSE_BRACKETS).
+                    append(REFERENCES).append(foreign.getRefName()).append(OPEN_BRACKETS).append(foreign.getRefId()).append(CLOSE_BRACKETS);
             index++;
 
             if (isThisNotLastElement(index, size)){

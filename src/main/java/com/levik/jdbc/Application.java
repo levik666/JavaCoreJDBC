@@ -1,7 +1,10 @@
 package com.levik.jdbc;
 
+import java.util.Calendar;
 import java.util.Set;
 
+import com.levik.jdbc.entiry.Blog;
+import com.levik.jdbc.entiry.User;
 import org.apache.log4j.Logger;
 
 import com.levik.jdbc.configuration.model.BasicDataSource;
@@ -20,6 +23,21 @@ public class Application {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataBaseType.MY_SQL, basicDataSource);
         jdbcTemplate.setTypeConverter(new MySqlTypeConverter());
         jdbcTemplate.setDdlAuto(DDLAuto.CREATE_DROP);
+
+        Blog blog = new Blog();
+        blog.setId(1);
+        blog.setName("test");
+        blog.setCreated(Calendar.getInstance().getTime());
+
+        User u1 = new User();
+        u1.setId(1);
+        u1.setPassword("test");
+        u1.setEmail("test@i.ua");
+        u1.setFirstName("test");
+        u1.setBlog(blog);
+
+        jdbcTemplate.createTable(blog);
+        jdbcTemplate.createTable(u1);
 
         final Cart cart = new Cart();
         cart.setCartId(2);
