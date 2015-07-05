@@ -18,7 +18,13 @@ import com.levik.jdbc.configuration.model.ValueType;
 import com.levik.jdbc.configuration.utils.JDBCUtils;
 
 public class JdbcTemplate extends PooledDataSource {
-	static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
+	private static final Logger LOGGER = Logger.getLogger(JdbcTemplate.class);
+
+    private static final int DEFAULT_INIT_CAPACITY = 10;
+
+    public JdbcTemplate(DataBaseType dataBaseType, BasicDataSource dataSource){
+        this(dataBaseType, dataSource, DEFAULT_INIT_CAPACITY);
+    }
 
     public JdbcTemplate(DataBaseType dataBaseType, BasicDataSource dataSource, int capacity) {
         super(dataBaseType, dataSource, capacity);
@@ -36,19 +42,19 @@ public class JdbcTemplate extends PooledDataSource {
             connection = getConnection();
 
             if (DDLAuto.CREATE == getDdlAuto()) {
-                final String createQuery = super.createQuery(dataBaseMetaDate);
-                JDBCUtils.performStatement(connection, createQuery);
+                LOGGER.info("perform create table");
+                final String query = super.createQuery(dataBaseMetaDate);
+                LOGGER.info("query: "+ query);
+                JDBCUtils.performStatement(connection, query);
             } else if (DDLAuto.CREATE_DROP == getDdlAuto()) {
+                LOGGER.info("perform create drop table");
                 final String dropQuery = super.dropQuery();
-                final String createQuery = super.createQuery(dataBaseMetaDate);
+                LOGGER.info("dropQuery: "+ dropQuery);
+                final String query = super.createQuery(dataBaseMetaDate);
+                LOGGER.info("query: "+ query);
 
-                try {
-                    JDBCUtils.performStatement(connection, dropQuery);
-                } catch (JDBCException exe) {
-                    System.err.println("Can't drop table " + exe.getMessage());
-                }
-
-                JDBCUtils.performStatement(connection, createQuery);
+                JDBCUtils.performStatement(connection, dropQuery);
+                JDBCUtils.performStatement(connection, query);
             }
         } finally {
             released(connection);
@@ -61,12 +67,12 @@ public class JdbcTemplate extends PooledDataSource {
     	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
-        final String saveQuery = super.saveQuery(dataBaseMetaDate);
+        final String query = super.saveQuery(dataBaseMetaDate);
+        LOGGER.info("query: "+ query);
 
         try {
             connection = getConnection();
-            JDBCUtils.performPrepareStatement(connection, saveQuery);
-
+            JDBCUtils.performPrepareStatement(connection, query);
         } finally {
             released(connection);
         }
@@ -78,12 +84,12 @@ public class JdbcTemplate extends PooledDataSource {
     	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
-        final String saveQuery = super.updateQuery(dataBaseMetaDate);
+        final String query = super.updateQuery(dataBaseMetaDate);
+        LOGGER.info("query: "+ query);
 
         try {
             connection = getConnection();
-            JDBCUtils.performPrepareStatement(connection, saveQuery);
-
+            JDBCUtils.performPrepareStatement(connection, query);
         } finally {
             released(connection);
         }
@@ -95,59 +101,59 @@ public class JdbcTemplate extends PooledDataSource {
     	Connection connection = null;
         final Map<String, ValueType> dataBaseMetaDate = objectProcessedBefore(obj);
 
-        final String saveQuery = super.deleteQuery(dataBaseMetaDate);
+        final String query = super.deleteQuery(dataBaseMetaDate);
+        LOGGER.info("query: "+ query);
 
         try {
             connection = getConnection();
-            JDBCUtils.performPrepareStatement(connection, saveQuery);
-
+            JDBCUtils.performPrepareStatement(connection, query);
         } finally {
             released(connection);
         }
     }
     
-	public <T> T select(String query, Class<T> aclass) {
-		LOGGER.info("Select from Db: " + query);
+	public <T> T select(String query, Class<T> aClass) {
+        LOGGER.info("Select entity: "+ aClass.getName());
+		LOGGER.info("query: " + query);
 
 		Connection connection = null;
-		ResultSet resultSet = null;
 		T obj = null;
 
 		try {
 			connection = getConnection();
-			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
+            ResultSet resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
 					query);
 			if (resultSet.next()) {
                 obj = getObjectFromResultSet(
-                        resultSet, aclass);
+                        resultSet, aClass);
 			}
 		} catch (SQLException | IllegalArgumentException
 				| IllegalAccessException | InstantiationException exe) {
-            throw new JDBCException(exe.getMessage());
+            throw new JDBCException(exe.getMessage(), exe);
 		} finally {
             released(connection);
 		}
 		return obj;
 	}
 	
-	public <T> Set<T> selectSet(String query, Class<T> aclass) {
-		LOGGER.info("Select from Db: " + query);
+	public <T> Set<T> selectSet(String query, Class<T> aClass) {
+        LOGGER.info("Select entity: "+ aClass.getName());
+        LOGGER.info("query: " + query);
 
 		Connection connection = null;
-		ResultSet resultSet = null;
-		final Set<T> objSet = new HashSet<T>();
+		final Set<T> objSet = new HashSet<>();
 
 		try {
 			connection = getConnection();
-			resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
+            ResultSet resultSet = JDBCUtils.performPrepareStatementWithResult(connection,
 					query);
 			while (resultSet.next()) {
-                T obj = getObjectFromResultSet(resultSet, aclass);
+                T obj = getObjectFromResultSet(resultSet, aClass);
                 objSet.add(obj);
 			}
 		} catch (SQLException | IllegalArgumentException
 				| IllegalAccessException | InstantiationException exe) {
-			throw new JDBCException(exe.getMessage());
+			throw new JDBCException(exe.getMessage(), exe);
 		} finally {
             released(connection);
 		}

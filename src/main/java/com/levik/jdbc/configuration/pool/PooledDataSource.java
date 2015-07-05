@@ -18,9 +18,7 @@ public class PooledDataSource extends AbstractTemplate {
 
     public PooledDataSource(final DataBaseType dataBaseType, final BasicDataSource dataSource, final int capacity) {
         super(dataBaseType, dataSource);
-
         this.capacity = capacity;
-
         queue = new ArrayBlockingQueue<>(capacity);
     }
 
@@ -54,10 +52,8 @@ public class PooledDataSource extends AbstractTemplate {
                 }
 
                 return true;
-
-
             } catch (SQLException exe) {
-                throw new JDBCException(exe.getMessage());
+                throw new JDBCException(exe.getMessage(), exe);
             }
         }
 
