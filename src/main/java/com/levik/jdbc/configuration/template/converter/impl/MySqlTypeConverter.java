@@ -12,6 +12,7 @@ public class MySqlTypeConverter implements TypeConverter{
 
     {
         dataBaseParams.put("java.lang.String", "VARCHAR(255)");
+        dataBaseParams.put("java.util.Date", "DATETIME");
     }
 
     public MySqlTypeConverter(){}

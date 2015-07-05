@@ -49,11 +49,16 @@ public class JdbcTemplate extends PooledDataSource {
             } else if (DDLAuto.CREATE_DROP == getDdlAuto()) {
                 LOGGER.info("perform create drop table");
                 final String dropQuery = super.dropQuery();
-                LOGGER.info("dropQuery: "+ dropQuery);
+                LOGGER.info("dropQuery: " + dropQuery);
                 final String query = super.createQuery(dataBaseMetaDate);
-                LOGGER.info("query: "+ query);
+                LOGGER.info("query: " + query);
 
-                JDBCUtils.performStatement(connection, dropQuery);
+                try {
+                    JDBCUtils.performStatement(connection, dropQuery);
+                } catch (JDBCException exe) {
+                    LOGGER.warn("Table is not exist " + exe.getMessage());
+                }
+
                 JDBCUtils.performStatement(connection, query);
             }
         } finally {
